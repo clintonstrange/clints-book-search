@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Jumbotron,
   Container,
@@ -16,17 +16,14 @@ import Auth from "../utils/auth";
 import { removeBookId } from "../utils/localStorage";
 
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
-  const { loading, data } = useQuery(GET_ME, {
-    variables: { user: userData },
-  });
+  //const [userData, setUserData] = useState({});
+  const { loading, data } = useQuery(GET_ME);
+  const userData = data?.me || [];
   const [removeBook] = useMutation(REMOVE_BOOK);
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // var userData = data?.me || [];
+  // use this to determine if `useEffect()` hook needs to run again
+  // const userDataLength = Object.keys(userData).length;
 
   // useEffect(() => {
   //   const getUserData = async () => {
@@ -62,11 +59,11 @@ const SavedBooks = () => {
     }
 
     try {
-      const updatedUser = await removeBook({
-        variables: { bookId },
+      await removeBook({
+        variables: { bookId: bookId },
       });
 
-      setUserData(updatedUser);
+      //setUserData(updatedUser);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
       // const response = await deleteBook(bookId, token);
@@ -79,10 +76,9 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
   }
-
   return (
     <>
       <Jumbotron fluid className="text-light bg-dark">
